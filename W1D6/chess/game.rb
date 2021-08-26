@@ -18,7 +18,6 @@ class Game
             switch_player
 
             # current thing: not here but shouldn't allow player to make a move that puts them in check
-            
 
             puts "Your King is in check!" if @board.check?(@players[0])
 
