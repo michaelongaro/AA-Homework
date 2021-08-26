@@ -1,53 +1,50 @@
 class Pawn
 
     attr_reader :color, :pos, :board
-    attr_writer :pos
+    attr_writer :pos, :board
 
     def initialize(color, pos, board)
         @color = color 
         @pos = pos
         @board = board
-        if @color == :white
-            @moves = [
-                        [-2,0], [-1,1], [-1,-1]
-            ]
-        else
-            @moves = [
-                       [2,0], [1,1], [-1,1]
-            ]
-        end
+        @moves = [ [-1,0], [-1,1], [-1,-1] ] if @color == :white
+        @moves = [ [1,0], [1,1], [-1,1] ] if @color == :light_black
     end
 
-    def move_to(end_pos)
-         
+    def move_to(end_pos)   
+
         temp_pos = [(@pos[0] + @moves[0][0]), @pos[1]] # tests moving "forward 1/2 squares"
         if temp_pos.all? { |coord| (0..7).include?(coord) }
-            #puts @board[@pos]
-            if @board[temp_pos] == NullPiece || temp_pos == end_pos
-                color == :white ? @moves[0] = [-1,0] : @moves[0] = [1,0]
+
+            if @board[temp_pos].instance_of?(NullPiece) && temp_pos != end_pos
+                if (@pos[0] == 1 && @color == :light_black) || (@pos[0] == 6 && @color == :white)
+                    temp_pos = [(@pos[0] + (@moves[0][0] * 2)), @pos[1]]
+                    if @board[temp_pos].instance_of?(NullPiece) && temp_pos == end_pos
+                        return true
+                    end
+                end
+
+            elsif @board[temp_pos].instance_of?(NullPiece) && temp_pos == end_pos
                 return true
+
             else
-                temp_pos = [(@pos[0] + @moves[1]), (@pos[1] + @moves[1])] # tests moving to the right diagonally to take a piece
+                temp_pos = [(@pos[0] + @moves[1][0]), (@pos[1] + @moves[1][1])] # tests moving to the right diagonally to take a piece
                 if temp_pos.all? { |coord| (0..7).include?(coord) }
-                    if @board[temp_pos] != NullPiece || temp_pos == end_pos
+                    if !@board[temp_pos].instance_of?(NullPiece) && temp_pos == end_pos
                         return true
                     else
-                        temp_pos = [(@pos[0] + @moves[2]), (@pos[1] + @moves[2])] # tests moving to the left diagonally to take a piece
+                        temp_pos = [(@pos[0] + @moves[2][0]), (@pos[1] + @moves[2][1])] # tests moving to the left diagonally to take a piece
                         if temp_pos.all? { |coord| (0..7).include?(coord) }
-                            if @board[temp_pos] != NullPiece || temp_pos == end_pos
+                            if !@board[temp_pos].instance_of?(NullPiece) && temp_pos == end_pos
                                 return true
-                            else
-                                return false
                             end
                         end
                     end
                 end
             end
-        else
-            return false
         end
         
-        
+        false
     end
 
     def to_s
